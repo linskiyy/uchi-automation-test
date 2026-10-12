@@ -10,10 +10,12 @@ test.describe('Uchi.ru widget ', () => {
     // ждем DOM  чтобы сохранить время общего таймаута.
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    // cookieбаннер перехватывает клики по виджет поэтому сначала закрываем его
-    await page.getByText('ОК', { exact: true }).first().click();
-    // продолжаем только после удаления перекрывающего баннера
-    await expect(page.locator('._UCHI_COOKIE__wrap')).toHaveCount(0);
+    // закрываем cookie баннер только если сайт его показал
+    const cookieButton = page.getByText('ОК', { exact: true }).first();
+    if (await cookieButton.isVisible()) {
+      await cookieButton.click();
+      await expect(page.locator('._UCHI_COOKIE__wrap')).toHaveCount(0);
+    }
   });
 
   test('opens', async ({page}) => {
